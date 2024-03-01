@@ -17,6 +17,17 @@ type Todo struct {
 
 var dbPool *pgxpool.Pool
 
+func getPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":3000"
+	} else {
+		port = ":" + port
+	}
+
+	return port
+}
+
 func main() {
 	// Connect to the database
 	dbUrl := os.Getenv("DATABASE_URL")
@@ -35,7 +46,7 @@ func main() {
 	app.Put("/todos/:id", updateTodo)
 	app.Delete("/todos/:id", deleteTodo)
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(getPort())
 }
 
 // Handlers for the routes will go here
