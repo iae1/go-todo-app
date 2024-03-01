@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -18,7 +19,7 @@ var dbPool *pgxpool.Pool
 
 func main() {
 	// Connect to the database
-	dbUrl := "postgres://isaaceaston:posgres@localhost:5432/todo_db"
+	dbUrl := os.Getenv("DATABASE_PRIVATE_URL")
 	var err error
 	dbPool, err = pgxpool.Connect(context.Background(), dbUrl)
 	if err != nil {
