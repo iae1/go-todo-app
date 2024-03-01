@@ -46,7 +46,7 @@ func main() {
 	app.Put("/todos/:id", updateTodo)
 	app.Delete("/todos/:id", deleteTodo)
 
-	log.Fatal(getPort())
+	log.Fatal(app.Listen(getPort()))
 }
 
 // Handlers for the routes will go here
