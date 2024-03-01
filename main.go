@@ -40,7 +40,7 @@ func main() {
 
 	app := fiber.New()
 
-	// Setup routes
+	// Setup routess
 	app.Get("/todos", getTodos)
 	app.Post("/todos", createTodo)
 	app.Put("/todos/:id", updateTodo)
