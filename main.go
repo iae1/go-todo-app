@@ -19,7 +19,7 @@ var dbPool *pgxpool.Pool
 
 func main() {
 	// Connect to the database
-	dbUrl := os.Getenv("DATABASE_PRIVATE_URL")
+	dbUrl := os.Getenv("DATABASE_URL")
 	var err error
 	dbPool, err = pgxpool.Connect(context.Background(), dbUrl)
 	if err != nil {
