@@ -20,8 +20,7 @@ func Login(store *session.Store) func(c *fiber.Ctx) error {
         if sess.Get("username") != nil {
             return c.Status(fiber.StatusBadRequest).SendString("User already logged in")
         }
-
-
+        
 		type LoginRequest struct {
 			Username string `json:"username"`
 			Password string `json:"password"`
@@ -42,7 +41,6 @@ func Login(store *session.Store) func(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid login credentials"})
 		}
 
-		sess, err := store.Get(c)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot get session"})
 		}
