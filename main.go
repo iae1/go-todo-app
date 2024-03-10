@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -39,6 +40,13 @@ func main() {
 	defer dbPool.Close()
 
 	app := fiber.New()
+
+	scratchOrgUrl := os.Getenv("SCRATCH_ORG_URL")
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: scratchOrgUrl,
+		AllowHeaders:  "Origin, Content-Type, Accept",
+	}))
 
 	// Setup routess
 	app.Get("/todos", getTodos)
