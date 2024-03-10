@@ -1,21 +1,18 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
+	"go-todo-app/config"
+	"go-todo-app/db"
+	"go-todo-app/handlers"
+	"go-todo-app/middleware"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/joho/godotenv"
 )
-
-type Todo struct {
-	ID        int    `json:"id"`
-	Title     string `json:"title"`
-	Completed bool   `json:"completed"`
-}
-
-var dbPool *pgxpool.Pool
 
 func getPort() string {
 	port := os.Getenv("PORT")
@@ -28,25 +25,31 @@ func getPort() string {
 	return port
 }
 
+func setupRoutes(app *fiber.App, store *session.Store) {
+	app.Post("/register", handlers.Register(store))
+    app.Post("/login", handlers.Login(store))
+
+	app.Get("/todos", middleware.IsAuthenticated(config.Store), handlers.GetTodos(config.Store))
+	app.Post("/todos", middleware.IsAuthenticated(config.Store), handlers.CreateTodo(config.Store))
+	app.Put("/todos/:id", middleware.IsAuthenticated(config.Store), handlers.UpdateTodo(config.Store))
+	app.Delete("/todos/:id", middleware.IsAuthenticated(config.Store), handlers.DeleteTodo(config.Store))
+}
+
 func main() {
-	// Connect to the database
-	dbUrl := os.Getenv("DATABASE_URL")
-	var err error
-	dbPool, err = pgxpool.Connect(context.Background(), dbUrl)
-	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
-	}
-	defer dbPool.Close()
+	if err := godotenv.Load(); err != nil {
+        log.Println("No .env file found")
+    }
+
+	config.SetupSessionStore()
 
 	app := fiber.New()
 
-	// Setup routess
-	app.Get("/todos", getTodos)
-	app.Post("/todos", createTodo)
-	app.Put("/todos/:id", updateTodo)
-	app.Delete("/todos/:id", deleteTodo)
+	if err := db.ConnectToDB(); err != nil {
+        log.Fatalf("Error connecting to the database: %v", err)
+    }
+    defer db.CloseDB()
+
+	setupRoutes(app, config.Store)
 
 	log.Fatal(app.Listen(getPort()))
 }
-
-// Handlers for the routes will go here
