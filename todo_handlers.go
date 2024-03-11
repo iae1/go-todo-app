@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/gofiber/fiber/v2"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func getTodos(c *fiber.Ctx) error {
 	todos := []Todo{}
-	rows, err := dbPool.Query(context.Background(), "SELECT id, title, completed FROM todos")
+	rows, err := dbPool.Query(context.Background(), "SELECT id, title, completed FROM todoz")
 	if err != nil {
 		return c.Status(500).SendString(err.Error())
 	}
@@ -32,7 +33,7 @@ func createTodo(c *fiber.Ctx) error {
 		return c.Status(400).SendString(err.Error())
 	}
 
-	const insertSQL = `INSERT INTO todos (title, completed) VALUES ($1, $2) RETURNING id`
+	const insertSQL = `INSERT INTO todoz (title, completed) VALUES ($1, $2) RETURNING id`
 	err := dbPool.QueryRow(context.Background(), insertSQL, todo.Title, todo.Completed).Scan(&todo.ID)
 	if err != nil {
 		return c.Status(500).SendString(err.Error())
@@ -53,7 +54,7 @@ func updateTodo(c *fiber.Ctx) error {
 		return c.Status(400).SendString(err.Error())
 	}
 
-	const updateSQL = `UPDATE todos SET title = $1, completed = $2 WHERE id = $3`
+	const updateSQL = `UPDATE todoz SET title = $1, completed = $2 WHERE id = $3`
 	_, err = dbPool.Exec(context.Background(), updateSQL, todo.Title, todo.Completed, id)
 	if err != nil {
 		return c.Status(500).SendString(err.Error())
@@ -69,7 +70,7 @@ func deleteTodo(c *fiber.Ctx) error {
 		return c.Status(400).SendString(err.Error())
 	}
 
-	const deleteSQL = `DELETE FROM todos WHERE id = $1`
+	const deleteSQL = `DELETE FROM todoz WHERE id = $1`
 	_, err = dbPool.Exec(context.Background(), deleteSQL, id)
 	if err != nil {
 		return c.Status(500).SendString(err.Error())
